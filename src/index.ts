@@ -15,6 +15,7 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ADMIN_KEY) {
 }
 
 router.get("/message", async (ctx, next) => {
+  ctx.set("Access-Control-Allow-Origin", "*");
   ctx.body = {
     msg: ln.getMessage(),
   };
@@ -22,6 +23,7 @@ router.get("/message", async (ctx, next) => {
 });
 
 router.post("/signup", async (ctx, next) => {
+  ctx.set("Access-Control-Allow-Origin", "*");
   const body = ctx.request.body as Record<string, unknown> | undefined;
   if (
     !body ||
@@ -37,6 +39,7 @@ router.post("/signup", async (ctx, next) => {
 });
 
 router.post("/login", async (ctx, next) => {
+  ctx.set("Access-Control-Allow-Origin", "*");
   const body = ctx.request.body as Record<string, unknown> | undefined;
   if (!body || typeof body?.signature !== "string") ctx.throw(400);
   else
