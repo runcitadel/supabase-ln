@@ -7,8 +7,10 @@ dotenv.config();
 import * as ln from "./lightning.js";
 
 const koa = new Koa();
-koa.use(cors());
 const router = new Router();
+router.use(cors({
+  allowMethods: 'POST,OPTIONS'
+}));
 router.use(koaBody());
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ADMIN_KEY) {
@@ -48,5 +50,6 @@ router.post("/login", async (ctx, next) => {
   await next();
 });
 
-koa.use(router.middleware());
+koa.use(router.routes());
+koa.use(router.allowedMethods());
 koa.listen(process.env.PORT || 3000);
