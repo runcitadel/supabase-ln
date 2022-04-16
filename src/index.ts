@@ -7,9 +7,9 @@ dotenv.config();
 import * as ln from "./lightning.js";
 
 const koa = new Koa();
+koa.use(cors());
 const router = new Router();
 router.use(koaBody());
-router.use(cors());
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ADMIN_KEY) {
   console.error("SUPABASE_URL or SUPABASE_ADMIN_KEY missing!");
