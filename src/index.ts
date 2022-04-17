@@ -1,16 +1,17 @@
 import Koa from "koa";
 import Router from "@koa/router";
 import koaBody from "koa-body";
-import cors from "@koa/cors";
 import dotenv from "dotenv";
 dotenv.config();
 import * as ln from "./lightning.js";
 
 const koa = new Koa();
 const router = new Router();
-router.use(cors({
-  allowMethods: 'POST,OPTIONS'
-}));
+koa.use(async (ctx, next) => {
+  ctx.set("Access-Control-Allow-Origin", "*")
+  ctx.set("Access-Control-Allow-Headers", "*")
+  await next();
+});
 router.use(koaBody());
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ADMIN_KEY) {
