@@ -1,4 +1,4 @@
-import Lightning, { type CheckmessageResponse } from "https://deno.land/x/core_ln@v0.3.2/mod.ts";
+import Lightning, { type CheckmessageResponse } from "https://deno.land/x/core_ln@v0.3.4/mod.ts";
 import * as db from "./db.ts";
 
 const ln = new Lightning(Deno.env.get("CORE_LN_SOCKET") || "/c-lightning/rpc");
