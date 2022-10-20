@@ -1,56 +1,57 @@
-import Koa from "koa";
-import Router from "@koa/router";
-import koaBody from "koa-body";
-import dotenv from "dotenv";
-dotenv.config();
-import * as ln from "./lightning.js";
+import { Application, Router } from "https://deno.land/x/oak@v11.1.0/mod.ts";
+import * as ln from "./lightning.ts";
 
-const koa = new Koa();
+const app = new Application();
 const router = new Router();
-koa.use(async (ctx, next) => {
-  ctx.set("Access-Control-Allow-Origin", "*")
-  ctx.set("Access-Control-Allow-Headers", "*")
+app.use(async (ctx, next) => {
+  ctx.response.headers.set("Access-Control-Allow-Origin", "*");
+  ctx.response.headers.set("Access-Control-Allow-Headers", "*")
   await next();
 });
-router.use(koaBody());
 
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ADMIN_KEY) {
+if (!Deno.env.get("SUPABASE_URL") || !Deno.env.get("SUPABASE_ADMIN_KEY")) {
   console.error("SUPABASE_URL or SUPABASE_ADMIN_KEY missing!");
-  process.exit(1);
+  Deno.exit(1);
 }
 
 router.get("/message", async (ctx, next) => {
-  ctx.body = {
+  ctx.response.body = {
     msg: ln.getMessage(),
   };
   await next();
 });
 
 router.post("/signup", async (ctx, next) => {
-  const body = ctx.request.body as Record<string, unknown> | undefined;
+  const body = await ctx.request.body({
+    type: "json",
+  }).value;
   if (
     !body ||
-    typeof body?.signature !== "string" ||
+    typeof body.signature !== "string" ||
     typeof body?.password !== "string"
   )
     ctx.throw(400);
   else
-    ctx.body = {
+    ctx.response.body = {
       link: await ln.signUpFromSignature(body.signature, body.password),
     };
   await next();
 });
 
 router.post("/login", async (ctx, next) => {
-  const body = ctx.request.body as Record<string, unknown> | undefined;
+  const body = await ctx.request.body({
+    type: "json",
+  }).value;
   if (!body || typeof body?.signature !== "string") ctx.throw(400);
   else
-    ctx.body = {
+    ctx.response.body = {
       link: await ln.loginFromSignature(body.signature),
     };
   await next();
 });
 
-koa.use(router.routes());
-koa.use(router.allowedMethods());
-koa.listen(process.env.PORT || 3000);
+app.use(router.routes());
+app.use(router.allowedMethods());
+app.listen({
+  port: parseInt(Deno.env.get("PORT")!) || 3000,
+});

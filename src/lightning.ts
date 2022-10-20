@@ -1,7 +1,7 @@
-import Lightning, { type CheckmessageResponse } from "@core-ln/core";
-import * as db from "./db.js";
+import Lightning, { type CheckmessageResponse } from "https://deno.land/x/core_ln@v0.3.2/mod.ts";
+import * as db from "./db.ts";
 
-const ln = new Lightning(process.env.CORE_LN_SOCKET || "/c-lightning/rpc");
+const ln = new Lightning(Deno.env.get("CORE_LN_SOCKET") || "/c-lightning/rpc");
 
 export function getMessage() {
   return "Login for Citadel accounts. Do not sign this message if you are not trying to login on account.runcitadel.space. We never ask you to sign this via chat/email.";

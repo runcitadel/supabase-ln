@@ -1,8 +1,8 @@
-import Supabase from "@supabase/supabase-js";
+import { createClient } from "https://cdn.skypack.dev/@supabase/supabase-js?dts";
 
-const supabase = Supabase.createClient(
-  process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_ADMIN_KEY as string
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_ADMIN_KEY")!
 );
 
 export function getFakeEmail(pubkey: string) {
@@ -11,19 +11,21 @@ export function getFakeEmail(pubkey: string) {
 
 export async function addFakeUser(pubkey: string, password: string) {
   const mail = getFakeEmail(pubkey);
-  const { data, error } = await supabase.auth.api.generateLink("signup", mail, {
+  const { data, error } = await supabase.auth.admin.generateLink({
+    type: "signup",
+    email: mail,
     password,
   });
   if (error) throw new Error(error.message);
-  return (data as unknown as { action_link: string }).action_link;
+  return data.properties.action_link;
 }
 
 export async function loginFakeUser(pubkey: string) {
   const mail = getFakeEmail(pubkey);
-  const { data, error } = await supabase.auth.api.generateLink(
-    "magiclink",
-    mail
-  );
+  const { data, error } = await supabase.auth.admin.generateLink({
+    type: "magiclink",
+    email: mail,
+  });
   if (error) throw new Error(error.message);
-  return (data as unknown as { action_link: string }).action_link;
+  return data.properties.action_link;
 }
