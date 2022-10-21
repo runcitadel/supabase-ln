@@ -33,7 +33,7 @@ router.post("/signup", async (ctx, next) => {
     ctx.throw(400);
   else
     ctx.response.body = {
-      link: await ln.signUpFromSignature(body.signature, body.password),
+      link: await ln.signUpFromSignature(body.signature, body.password, body.redirectTo),
     };
   await next();
 });
@@ -45,7 +45,7 @@ router.post("/login", async (ctx, next) => {
   if (!body || typeof body?.signature !== "string") ctx.throw(400);
   else
     ctx.response.body = {
-      link: await ln.loginFromSignature(body.signature),
+      link: await ln.loginFromSignature(body.signature, body.redirectTo),
     };
   await next();
 });

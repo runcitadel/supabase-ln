@@ -14,7 +14,7 @@ export async function verifyMessage(zbase: string) {
   });
 }
 
-export async function signUpFromSignature(zbase: string, password: string) {
+export async function signUpFromSignature(zbase: string, password: string, redirectTo?: string) {
   let validationResult: CheckmessageResponse;
   try {
     validationResult = await verifyMessage(zbase);
@@ -23,13 +23,13 @@ export async function signUpFromSignature(zbase: string, password: string) {
   }
   if (!validationResult.verified) throw new Error("Invalid signature");
   try {
-    return db.addFakeUser(validationResult.pubkey as string, password);
+    return db.addFakeUser(validationResult.pubkey as string, password, redirectTo);
   } catch {
     throw new Error("User already exists!");
   }
 }
 
-export async function loginFromSignature(zbase: string) {
+export async function loginFromSignature(zbase: string, redirectTo?: string) {
   let validationResult: CheckmessageResponse;
   try {
     validationResult = await verifyMessage(zbase);
@@ -38,7 +38,7 @@ export async function loginFromSignature(zbase: string) {
   }
   if (!validationResult.verified) throw new Error("Invalid signature");
   try {
-    return db.loginFakeUser(validationResult.pubkey as string);
+    return db.loginFakeUser(validationResult.pubkey as string, redirectTo);
   } catch {
     throw new Error("User doesn't exists!");
   }
